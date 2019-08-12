@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<input id="test" type="button" value="高并发测试">
+		<script type="text/javascript" src="webjars/jquery/3.2.1/dist/jquery.js" ></script>
+		<script type="application/javascript">
+			$("test").click(function(){
+				for(var i=0; i<=50000; i++){
+					var params = {
+						userId : 1,
+						productId : 1,
+						quantity : 1
+					}
+					$.post("/test/purchase",params,function(){});
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="buyinggoods.mapper.ProductMapper">
+  <resultMap id="BaseResultMap" type="buyinggoods.model.Product">
+    <id column="t_product_id" jdbcType="INTEGER" property="id" />
+    <result column="t_product_product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="t_product_stock" jdbcType="INTEGER" property="stock" />
+    <result column="t_product_price" jdbcType="DECIMAL" property="price" />
+    <result column="t_product_version" jdbcType="INTEGER" property="version" />
+    <result column="t_product_note" jdbcType="VARCHAR" property="note" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    t_product.id as t_product_id, t_product.product_name as t_product_product_name, t_product.stock as t_product_stock, 
+    t_product.price as t_product_price, t_product.version as t_product_version, t_product.note as t_product_note
+  </sql>
+
+    <!-- 减库存 -->
+    <update id="decreaseProduct">
+        update t_product set stock = stock - #{quantity}, version = version + 1
+        where id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=INTEGER}
+    </update>
+
+    <!-- 减库存 -->
+    <update id="deleteProduct">
+        update t_product set stock = stock - #{quantity}, version = version + 1
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+  <select id="getProduct" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_product t_product
+    where t_product.id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_product
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="buyinggoods.model.Product" useGeneratedKeys="true">
+    insert into t_product (product_name, stock, price, 
+      version, note)
+    values (#{productName,jdbcType=VARCHAR}, #{stock,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{version,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="buyinggoods.model.Product" useGeneratedKeys="true">
+    insert into t_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="stock != null">
+        stock,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null">
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="buyinggoods.model.Product">
+    update t_product
+    <set>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="buyinggoods.model.Product">
+    update t_product
+    set product_name = #{productName,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      version = #{version,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
