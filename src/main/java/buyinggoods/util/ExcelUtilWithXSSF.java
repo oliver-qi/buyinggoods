@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
 public class ExcelUtilWithXSSF {
     public static void main(String[] args) {
         try {
-            getExcelAsFile("E:/data/qxw2.xlsx");
+            // 对2007及以上版本 使用XSSF解析
+            getExcelAsFile("E:/data/qxw3.xls");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -86,8 +86,7 @@ public class ExcelUtilWithXSSF {
                 }
 
                 //获得每一列中的值
-                System.out.print(cell1+"                   ");
-//                System.out.print(cell1.getStringCellValue()+"\t\t\t");
+                System.out.print(cell1.getRichStringCellValue().getString() + "\t\t");
             }
             System.out.println("第"+i+"行");
         }
