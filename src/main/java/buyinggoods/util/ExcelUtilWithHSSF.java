@@ -21,7 +21,9 @@ public class ExcelUtilWithHSSF {
     public static void main(String[] args) {
 
         try {
+            // HSSF只能解析2007版本之前的.xls格式的文件
             getExcelAsFile("E:/data/students2.xls");
+//            getExcelAsFile("E:/data/qxw2.xlsx");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -47,17 +47,10 @@ public class ExcelUtilWithXSSF {
      * @throws InvalidFormatException
      */
     public static void getExcelAsFile(String file) throws FileNotFoundException, IOException, InvalidFormatException{
-//		//1.得到Excel常用对象
-//		POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream("d:/FTP/new1.xls"));
-//		//2.得到Excel工作簿对象
-//		HSSFWorkbook wb = new HSSFWorkbook(fs);
-
-
-
-        InputStream ins = null;
-        Workbook wb = null;
-        ins=new FileInputStream(new File(file));
-        wb = WorkbookFactory.create(ins);
+        //1.得到Excel常用对象
+        InputStream ins = new FileInputStream(new File(file));
+        //2.得到Excel工作簿对象
+        Workbook wb = WorkbookFactory.create(ins);
         ins.close();
 
 
