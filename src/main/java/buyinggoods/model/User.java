@@ -12,4 +12,8 @@ import lombok.ToString;
 public class User {
     private String username;
     private String password;
+//    private String uid;
+//    private String name;
+//    private Integer age;
+//    private Date birthday;
 }

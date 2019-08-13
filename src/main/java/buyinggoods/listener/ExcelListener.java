@@ -2,18 +2,22 @@ package buyinggoods.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ExcelListener extends AnalysisEventListener {
-    //自定义用于暂时存储data。
-    //可以通过实例获取该值
-    private List<Object> datas = new ArrayList<Object>();
+    /**
+     * 自定义用于暂时存储data。
+     * 可以通过实例获取该值
+     */
+    private List<Object> datas = new ArrayList<>();
 
     @Override
     public void invoke(Object object, AnalysisContext context) {
-        System.out.println("当前行：" + context.getCurrentRowNum());
+        System.out.print("当前行：" + context.getCurrentRowNum() + "\t");
         System.out.println(object);
         //数据存储到list，供批量处理，或后续自己业务逻辑处理。
         datas.add(object);

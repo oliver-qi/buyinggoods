@@ -115,13 +115,13 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>1.0.0-RELEASE</version>
-            <exclusions>
+            <version>1.1.2-beat1</version>
+           <!-- <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-collections4</artifactId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
 
        <!-- <dependency>
