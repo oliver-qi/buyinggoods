@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class Texst {
     private static final String EXCEL_XLS = "xls";
@@ -35,13 +34,16 @@ public class Texst {
         }
     }
 
-    // 检查该文件是否是xls，还是xlsx类型
+    /**
+     * 检查该文件是否是xls,还是xlsx类型
+     * 如果是xlsx,返回true;如果是xls,返回false
+     * @param file
+     * @return
+     */
     private static boolean checkFile(File file) {
         boolean flg = false;
         if (file.exists()) {
-
             String name = file.getName();
-            // String lastindex = name.substring(name.lastIndexOf(".") + 1);
             if (name.endsWith(EXCEL_XLSX)) {
                 flg = true;
             }else{
@@ -53,16 +55,28 @@ public class Texst {
         return flg;
     }
 
-    // 如果是xlsx，做什么操作
+    // xlsx操作
     private static void xlsx(File file) {
-
         try {
             xssfWorkbook = new XSSFWorkbook(new FileInputStream(file));
             show(xssfWorkbook);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    // xls操作
+    private static void xls(File file) {
+        try {
+            workbook = new HSSFWorkbook(new FileInputStream(file));
+            show(workbook);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     //他们两者都有相同的父类，而且都是父类中的方法操作，那我干脆点直接将他们用父类的形式抽取出来，这样解决了代码的冗余问题
@@ -96,54 +110,37 @@ public class Texst {
         }
     }
 
-    // 如果是就做什么操作
-    private static void xls(File file) {
-        try {
-            InputStream inputStream = new FileInputStream(file);
-            workbook = new HSSFWorkbook(inputStream);
-            show(workbook);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     @SuppressWarnings("static-access")
     // 将他们两者的父类抽取出来，这样减少代码量，同时便于管理
     private static String getValue(Cell xssfCell, Workbook workbook) {
         String value = "";
-        switch (xssfCell.getCellType()) {
-            case Cell.CELL_TYPE_STRING:
+        switch (xssfCell.getCellTypeEnum()) {
+            case STRING:
                 value = String.valueOf(xssfCell.getRichStringCellValue()
                         .getString());
                 System.out.print("|");
                 break;
-            case Cell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 if (DateUtil.isCellDateFormatted(xssfCell)) {
-                    value = String.valueOf(String.valueOf(xssfCell
-                            .getDateCellValue()));
+                    value = String.valueOf(xssfCell.getDateCellValue());
                 } else {
                     value = String.valueOf(xssfCell.getNumericCellValue());
                 }
                 System.out.print("|");
                 break;
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 value = String.valueOf(xssfCell.getBooleanCellValue());
                 System.out.print("|");
                 break;
             // 公式,
-            case Cell.CELL_TYPE_FORMULA:
+            case FORMULA:
                 // 获取Excel中用公式获取到的值,//=SUM(P4-Q4-R4-S4)Excel用这种类似的公式计算出来的值用POI无法获取，要想获取的话，就必须一下操作
-                FormulaEvaluator evaluator = workbook.getCreationHelper()
-                        .createFormulaEvaluator();
+                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
                 evaluator.evaluateFormulaCell(xssfCell);
                 CellValue cellValue = evaluator.evaluate(xssfCell);
                 value = String.valueOf(cellValue.getNumberValue());
                 break;
-            case Cell.CELL_TYPE_ERROR:
+            case ERROR:
                 value = String.valueOf(xssfCell.getErrorCellValue());
                 break;
             default:
