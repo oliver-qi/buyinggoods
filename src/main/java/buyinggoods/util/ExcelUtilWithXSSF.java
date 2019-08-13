@@ -20,7 +20,7 @@ import java.io.OutputStream;
 public class ExcelUtilWithXSSF {
     public static void main(String[] args) {
         try {
-            getExcelAsFile("E:/data/students2.xls");
+            getExcelAsFile("E:/data/qxw2.xlsx");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -96,7 +96,7 @@ public class ExcelUtilWithXSSF {
                 System.out.print(cell1+"                   ");
 //                System.out.print(cell1.getStringCellValue()+"\t\t\t");
             }
-            System.out.println();
+            System.out.println("第"+i+"行");
         }
 
         //将修改后的数据保存
