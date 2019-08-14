@@ -1,7 +1,9 @@
 package exceltest;
 
 import buyinggoods.Application;
+import buyinggoods.entity.ReadUser;
 import buyinggoods.listener.ExcelListener;
+import buyinggoods.util.EasyExcelUtil;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.Sheet;
@@ -14,11 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class})
@@ -225,5 +233,35 @@ public class ExcelTest {
         writer.finish();
     }
 
-
+    /**
+     * 有模型读取Excel表格
+     */
+    @Test
+    public void testReadJavaModel() throws IOException{
+        InputStream is = new FileInputStream("E://data//qxw2.xlsx");
+        List<Object> objects = EasyExcelUtil.simpleReadJavaModel(is, 1, 1, ReadUser.class);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        objects.forEach(object->{
+//            if (object instanceof ReadUser) {
+//                ReadUser readUser = (ReadUser)object;
+//                StringBuilder sb = new StringBuilder();
+//                sb.append(readUser.getId()).append("\t").append(readUser.getName())
+//                        .append("\t").append(readUser.getAge()).append("\t")
+//                        .append(sdf.format(readUser.getBirthday()));
+//                System.out.println(sb);
+//            }
+//        });
+        List<ReadUser> collect = objects.stream().map(object -> {
+            ReadUser readUser = null;
+            if (object instanceof ReadUser) {
+                readUser = (ReadUser) object;
+                StringBuilder sb = new StringBuilder();
+                sb.append(readUser.getId()).append("\t").append(readUser.getName())
+                        .append("\t").append(readUser.getAge()).append("\t")
+                        .append(sdf.format(readUser.getBirthday()));
+                System.out.println(sb);
+            }
+            return readUser;
+        }).collect(Collectors.toList());
+    }
 }

@@ -110,14 +110,18 @@ public class Texst {
         }
     }
 
+    /**
+     * 将他们两者的父类抽取出来，这样减少代码量，同时便于管理
+     * @param xssfCell 单元格
+     * @param workbook 工作簿
+     * @return String
+     */
     @SuppressWarnings("static-access")
-    // 将他们两者的父类抽取出来，这样减少代码量，同时便于管理
     private static String getValue(Cell xssfCell, Workbook workbook) {
         String value = "";
         switch (xssfCell.getCellTypeEnum()) {
             case STRING:
-                value = String.valueOf(xssfCell.getRichStringCellValue()
-                        .getString());
+                value = String.valueOf(xssfCell.getRichStringCellValue().getString());
                 System.out.print("|");
                 break;
             case NUMERIC:
@@ -134,7 +138,8 @@ public class Texst {
                 break;
             // 公式,
             case FORMULA:
-                // 获取Excel中用公式获取到的值,//=SUM(P4-Q4-R4-S4)Excel用这种类似的公式计算出来的值用POI无法获取，要想获取的话，就必须一下操作
+                // 获取Excel中用公式获取到的值,
+                // =SUM(P4-Q4-R4-S4)Excel用这种类似的公式计算出来的值用POI无法获取，要想获取的话，就必须一下操作
                 FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
                 evaluator.evaluateFormulaCell(xssfCell);
                 CellValue cellValue = evaluator.evaluate(xssfCell);
@@ -144,6 +149,7 @@ public class Texst {
                 value = String.valueOf(xssfCell.getErrorCellValue());
                 break;
             default:
+                break;
         }
         return value;
     }
