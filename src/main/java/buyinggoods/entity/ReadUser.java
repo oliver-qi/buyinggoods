@@ -29,4 +29,8 @@ public class ReadUser extends BaseRowModel {
     @ExcelProperty(value = "生日", index = 3, format = "yyyy/MM/dd")
     @Setter@Getter
     private Date birthday;
+
+    @ExcelProperty
+    @Setter@Getter
+    private String str;
 }

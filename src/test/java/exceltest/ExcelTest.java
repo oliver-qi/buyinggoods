@@ -1,9 +1,11 @@
 package exceltest;
 
 import buyinggoods.Application;
+import buyinggoods.entity.MultiLineHeadExcelModel;
 import buyinggoods.entity.ReadUser;
 import buyinggoods.listener.ExcelListener;
 import buyinggoods.util.EasyExcelUtil;
+import buyinggoods.util.excel.ExcelParameter;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.Sheet;
@@ -25,7 +27,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
@@ -251,7 +255,7 @@ public class ExcelTest {
 //                System.out.println(sb);
 //            }
 //        });
-        List<ReadUser> collect = objects.stream().map(object -> {
+        List<ReadUser> readUserList = objects.stream().map(object -> {
             ReadUser readUser = null;
             if (object instanceof ReadUser) {
                 readUser = (ReadUser) object;
@@ -263,5 +267,80 @@ public class ExcelTest {
             }
             return readUser;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 无模板写Excel表格
+     */
+    @Test
+    public void testWriteExcel(){
+        String filePath = "E://data//writer_excel.xlsx";
+        ExcelParameter parameter = new ExcelParameter();
+        parameter.setSheetNo(1);
+        parameter.setSheetName("test1");
+//        parameter.setHeadLineMun(1);
+        Map<Integer, Integer> columnWidthMap = new HashMap<>();
+        columnWidthMap.put(0,4000);
+        columnWidthMap.put(1,3000);
+        columnWidthMap.put(2,2000);
+        columnWidthMap.put(3,8000);
+        parameter.setColumnWidth(columnWidthMap);
+        List<List<String>> listStringHead = new ArrayList<>();
+        listStringHead.add(Arrays.asList("用户ID"));
+        listStringHead.add(Arrays.asList("姓名"));
+        listStringHead.add(Arrays.asList("年龄"));
+        listStringHead.add(Arrays.asList("生日"));
+        parameter.setListStringHead(listStringHead);
+        List<List<Object>> data = new ArrayList<>();
+        for (int i=0;i<4;i++){
+            data.add(Arrays.asList("ID_"+i, "小明", i+"", new Date().toString()));
+        }
+        EasyExcelUtil.writeExcel(filePath, parameter, data);
+    }
+
+    /**
+     * 有模板写Excel表格
+     */
+    @Test
+    public void testWriteJavaModel(){
+        String filePath = "E://data//writerJavaModel_excel.xlsx";
+        ExcelParameter parameter = new ExcelParameter();
+        parameter.setSheetNo(1);
+        parameter.setSheetName("test1");
+//        parameter.setHeadLineMun(1);
+        Map<Integer, Integer> columnWidthMap = new HashMap<>();
+        columnWidthMap.put(0,4000);
+        columnWidthMap.put(1,3000);
+        columnWidthMap.put(2,2000);
+        columnWidthMap.put(3,8000);
+        parameter.setColumnWidth(columnWidthMap);
+        List<ReadUser> readUserList = new ArrayList<>();
+        for (int i=0;i<4;i++){
+            readUserList.add(new ReadUser("ID_"+i, "小明", i, new Date(), "多余"+i));
+        }
+        EasyExcelUtil.writeExcelWithTemplate(filePath, parameter, readUserList);
+    }
+
+    /**
+     * 多表头模型Excel表
+     */
+    @Test
+    public void testMultiLineHeadExcelModel(){
+        String filePath = "E://data//MultiLineHead_excel.xlsx";
+        ExcelParameter parameter = new ExcelParameter();
+        parameter.setSheetNo(1);
+        parameter.setSheetName("test1");
+//        parameter.setHeadLineMun(1);
+        Map<Integer, Integer> columnWidthMap = new HashMap<>();
+        columnWidthMap.put(0,4000);
+        columnWidthMap.put(1,3000);
+        columnWidthMap.put(2,2000);
+        columnWidthMap.put(3,8000);
+        parameter.setColumnWidth(columnWidthMap);
+        List<MultiLineHeadExcelModel> multiLineHeadList = new ArrayList<>();
+        for (int i=0;i<4;i++){
+            multiLineHeadList.add(new MultiLineHeadExcelModel());
+        }
+        EasyExcelUtil.writeExcelWithTemplate(filePath, parameter, multiLineHeadList);
     }
 }
