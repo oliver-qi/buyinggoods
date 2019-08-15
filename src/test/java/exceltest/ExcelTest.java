@@ -14,7 +14,6 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.metadata.Table;
-import com.alibaba.excel.metadata.TableStyle;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import lombok.Cleanup;
 import org.junit.Test;
@@ -401,7 +400,7 @@ public class ExcelTest {
     @Test
     public void multipleSheet() {
         try (OutputStream out = new FileOutputStream("E://data//sheets.xlsx")){
-            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX,false);
+            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX);
             //写第一个sheet, sheet1  数据全是List<String> 无模型映射关系
             Sheet sheet1 = new Sheet(1, 0);
             sheet1.setSheetName("第一个sheet");
@@ -414,7 +413,7 @@ public class ExcelTest {
 
             //写第二个sheet sheet2  模型上打有表头的注解，合并单元格
             Sheet sheet2 = new Sheet(2, 0, MultiLineHeadExcelModel.class, "第二个sheet", null);
-            sheet2.setTableStyle(new TableStyle());
+//            sheet2.setTableStyle(new TableStyle());
             List<MultiLineHeadExcelModel> data = new ArrayList<>();
             for (int i=0;i<1000;i++){
                 data.add(new MultiLineHeadExcelModel(i+"-1",i+"-2",i+"-3",i+"-4",i+"-5",i+"-6",i+"-7",i+"-8",i+"-9"));
@@ -423,15 +422,9 @@ public class ExcelTest {
 
             //写sheet3  模型上没有注解，表头数据动态传入
             List<List<String>> head = new ArrayList<>();
-            List<String> headCoulumn1 = new ArrayList<>();
-            List<String> headCoulumn2 = new ArrayList<>();
-            List<String> headCoulumn3 = new ArrayList<>();
-            headCoulumn1.add("第一列");
-            headCoulumn2.add("第二列");
-            headCoulumn3.add("第三列");
-            head.add(headCoulumn1);
-            head.add(headCoulumn2);
-            head.add(headCoulumn3);
+            head.add(Arrays.asList("第一列"));
+            head.add(Arrays.asList("第二列"));
+            head.add(Arrays.asList("第三列"));
             Sheet sheet3 = new Sheet(3, 1, NoAnnModel.class, "第三个sheet", head);
             List<NoAnnModel> noAnnModels = new ArrayList<>();
             for (int i = 0; i < 100; i++) {

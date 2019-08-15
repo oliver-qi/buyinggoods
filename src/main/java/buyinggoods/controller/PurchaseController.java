@@ -35,4 +35,8 @@ public class PurchaseController {
         return new RecordVo(success, message);
     }
 
+    @RequestMapping("test1")
+    public String test(){
+        return "success";
+    }
 }
