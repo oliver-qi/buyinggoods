@@ -2,14 +2,19 @@ package exceltest;
 
 import buyinggoods.Application;
 import buyinggoods.entity.MultiLineHeadExcelModel;
+import buyinggoods.entity.NoAnnModel;
 import buyinggoods.entity.ReadUser;
 import buyinggoods.listener.ExcelListener;
 import buyinggoods.util.EasyExcelUtil;
 import buyinggoods.util.excel.ExcelParameter;
 import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.metadata.Table;
+import com.alibaba.excel.metadata.TableStyle;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import lombok.Cleanup;
 import org.junit.Test;
@@ -19,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -330,17 +336,156 @@ public class ExcelTest {
         ExcelParameter parameter = new ExcelParameter();
         parameter.setSheetNo(1);
         parameter.setSheetName("test1");
-//        parameter.setHeadLineMun(1);
-        Map<Integer, Integer> columnWidthMap = new HashMap<>();
-        columnWidthMap.put(0,4000);
-        columnWidthMap.put(1,3000);
-        columnWidthMap.put(2,2000);
-        columnWidthMap.put(3,8000);
-        parameter.setColumnWidth(columnWidthMap);
         List<MultiLineHeadExcelModel> multiLineHeadList = new ArrayList<>();
-        for (int i=0;i<4;i++){
-            multiLineHeadList.add(new MultiLineHeadExcelModel());
+        for (int i=0;i<100000;i++){
+            multiLineHeadList.add(new MultiLineHeadExcelModel(i+"-1",i+"-2",i+"-3",i+"-4",i+"-5",i+"-6",i+"-7",i+"-8",i+"-9"));
         }
         EasyExcelUtil.writeExcelWithTemplate(filePath, parameter, multiLineHeadList);
+    }
+
+    /**
+     * 无模型读Excel表格
+     * 抛弃了许多不需要的信息(如：样式...)
+     */
+    @Test
+    public void noModelMultipleSheet() {
+//        String filePath = "E://data//modelWrite.xlsx";
+        String filePath = "E://data//tables.xlsx";
+        try (InputStream inputStream = new FileInputStream(filePath)){
+
+            ExcelReader reader = new ExcelReader(inputStream, ExcelTypeEnum.XLSX, null,
+                    new AnalysisEventListener<List<String>>() {
+                        int i = 0;
+                        @Override
+                        public void invoke(List<String> object, AnalysisContext context) {
+                            System.out.println("当前sheet:" + context.getCurrentSheet().getSheetNo() + " 当前行：" +
+                                    context.getCurrentRowNum() + " data:" + object);
+                            i++;
+                        }
+                        @Override
+                        public void doAfterAllAnalysed(AnalysisContext context) {
+                            System.out.println(i);
+                        }
+                    });
+            reader.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 有模型写
+     * 抛弃了许多不需要的信息(如：样式...)
+     */
+    @Test
+    public void modelWrite() {
+        try (OutputStream out = new FileOutputStream("E://data//modelWrite.xlsx")){
+            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX);
+            //写第一个sheet, sheet1  数据全是List<String> 无模型映射关系
+            Sheet sheet = new Sheet(1, 0, MultiLineHeadExcelModel.class);
+            sheet.setSheetName("test1");
+            List<MultiLineHeadExcelModel> data = new ArrayList<>();
+            for (int i=0;i<100000;i++){
+                data.add(new MultiLineHeadExcelModel(i+"-1",i+"-2",i+"-3",i+"-4",i+"-5",i+"-6",i+"-7",i+"-8",i+"-9"));
+            }
+            writer.write(data, sheet);
+            writer.finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 一个Excel中有多个sheet
+     */
+    @Test
+    public void multipleSheet() {
+        try (OutputStream out = new FileOutputStream("E://data//sheets.xlsx")){
+            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX,false);
+            //写第一个sheet, sheet1  数据全是List<String> 无模型映射关系
+            Sheet sheet1 = new Sheet(1, 0);
+            sheet1.setSheetName("第一个sheet");
+            // 查询数据导出即可 比如说一次性总共查询出100条数据
+            List<List<String>> userList = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                userList.add(Arrays.asList("ID_" + i, "小明" + i, String.valueOf(i), new Date().toString()));
+            }
+            writer.write0(userList, sheet1);
+
+            //写第二个sheet sheet2  模型上打有表头的注解，合并单元格
+            Sheet sheet2 = new Sheet(2, 0, MultiLineHeadExcelModel.class, "第二个sheet", null);
+            sheet2.setTableStyle(new TableStyle());
+            List<MultiLineHeadExcelModel> data = new ArrayList<>();
+            for (int i=0;i<1000;i++){
+                data.add(new MultiLineHeadExcelModel(i+"-1",i+"-2",i+"-3",i+"-4",i+"-5",i+"-6",i+"-7",i+"-8",i+"-9"));
+            }
+            writer.write(data, sheet2);
+
+            //写sheet3  模型上没有注解，表头数据动态传入
+            List<List<String>> head = new ArrayList<>();
+            List<String> headCoulumn1 = new ArrayList<>();
+            List<String> headCoulumn2 = new ArrayList<>();
+            List<String> headCoulumn3 = new ArrayList<>();
+            headCoulumn1.add("第一列");
+            headCoulumn2.add("第二列");
+            headCoulumn3.add("第三列");
+            head.add(headCoulumn1);
+            head.add(headCoulumn2);
+            head.add(headCoulumn3);
+            Sheet sheet3 = new Sheet(3, 1, NoAnnModel.class, "第三个sheet", head);
+            List<NoAnnModel> noAnnModels = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                noAnnModels.add(new NoAnnModel(i+"-1", i+"-2", i+"-3"));
+            }
+            writer.write(noAnnModels, sheet3);
+            writer.finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @throws FileNotFoundException
+     */
+    @Test
+    public void multipleTable(){
+        try (OutputStream out = new FileOutputStream("E://data//tables.xlsx")) {
+            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX);
+            //写sheet1  数据全是List<String> 无模型映射关系
+            Sheet sheet1 = new Sheet(1, 0);
+            sheet1.setSheetName("第一个sheet");
+            Table table1 = new Table(1);
+            // 查询数据导出即可 比如说一次性总共查询出100条数据
+            List<List<String>> userList = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                userList.add(Arrays.asList("ID_" + i, "小明" + i, String.valueOf(i), new Date().toString()));
+            }
+            writer.write0(userList, sheet1, table1);
+            //写sheet2  模型上打有表头的注解
+            Table table2 = new Table(2);
+            table2.setClazz(MultiLineHeadExcelModel.class);
+            List<MultiLineHeadExcelModel> data = new ArrayList<>();
+            for (int i=0;i<150;i++){
+                data.add(new MultiLineHeadExcelModel(i+"-1",i+"-2",i+"-3",i+"-4",i+"-5",i+"-6",i+"-7",i+"-8",i+"-9"));
+            }
+            writer.write(data, sheet1, table2);
+            //写sheet3  模型上没有注解，表头数据动态传入,此情况下模型field顺序与excel现实顺序一致
+            List<List<String>> head = new ArrayList<>();
+            head.add(Arrays.asList("第一列","第一列"));
+            head.add(Arrays.asList("第二列","第二列"));
+            head.add(Arrays.asList("第三列","第四列"));
+            Table table3 = new Table(3);
+            table3.setHead(head);
+            table3.setClazz(NoAnnModel.class);
+            List<NoAnnModel> noAnnModels = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                noAnnModels.add(new NoAnnModel(i+"-1", i+"-2", i+"-3"));
+            }
+            writer.write(noAnnModels, sheet1, table3);
+            writer.finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
