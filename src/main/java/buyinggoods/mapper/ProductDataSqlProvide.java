@@ -6,6 +6,9 @@ import static org.apache.ibatis.jdbc.SqlBuilder.SELECT;
 import static org.apache.ibatis.jdbc.SqlBuilder.SQL;
 import static org.apache.ibatis.jdbc.SqlBuilder.WHERE;
 
+/**
+ * @author
+ */
 public class ProductDataSqlProvide {
 
     public String selectAll(Long id){
