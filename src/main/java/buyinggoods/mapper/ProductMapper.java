@@ -3,6 +3,8 @@ package buyinggoods.mapper;
 import buyinggoods.model.Product;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,4 +42,20 @@ public interface ProductMapper {
      * @return
      */
     int deleteProduct(@Param("id") Long id, @Param("quantity") Integer quantity);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @Select("select * from t_product where id = #{id}")
+    Product findAll(Long id);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @SelectProvider(type = ProductDataSqlProvide.class, method = "selectAll")
+    Product selectAll(Long id);
 }
